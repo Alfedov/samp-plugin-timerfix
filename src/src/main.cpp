@@ -105,17 +105,24 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
 {
 	unsigned long long now = GetMsTime();
-	for (auto it = timers.begin(); it != timers.end(); ++it) {
-		struct timer *t = it->second;
-		if (t->repeat != 0) {
-			if (t->next < now) {
+	for (std::map<int, struct timer*>::iterator it = timers.begin(), next = it; it != timers.end(); it = next)
+	{
+		++next;
+		struct timer* t = it->second;
+		if (t->repeat != 0)
+		{
+			if (t->next < now)
+			{
 				t->next += t->interval;
 				ExecuteTimer(it->second);
-				if (t->repeat > 0) {
+				if (t->repeat > 0)
+				{
 					--t->repeat;
 				}
 			}
-		} else {
+		}
+		else
+		{
 			DestroyTimer(t);
 			timers.erase(it);
 		}
